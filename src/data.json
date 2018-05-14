@@ -1,0 +1,105 @@
+{
+    "firstWord": [
+        [
+            "Introducing Ice Cream for any #mood.",
+            "Enjoy our playfully delicious ice creams,available online only!"
+        ],
+        [
+            "Introducing Ice Cream for any #mood.",
+            "Enjoy our playfully delicious ice cream sticks, available online only!"
+        ]
+    ],
+    "secondWord": [
+        [
+            {
+                "text1": "#Feisty:",
+                "featureId": 1,
+                "text2": "chocolate ice cream with fudge swirls & a bit of spice."
+            },
+            {
+                "text1": "#Lazy-ish:",
+                "featureId": 2,
+                "text2": "vanilla ice cream with caramel, peanut butter, and chocolate-covered pretzels."
+            },
+            {
+                "text1": "#Blessed:",
+                "featureId": 3,
+                "text2": "cookie dough ice cream with chocolate chips."
+            }
+        ],
+        [
+            {
+                "text1": "#Feisty:",
+                "featureId": 1,
+                "text2": "chocolate ice cream with a little cinnamon & cayenne, wrapped in chocolate sprinkles."
+            },
+            {
+                "text1": "#Lazy-ish:",
+                "featureId": 2,
+                "text2": "peanut butter ice cream wrapped with chocolate sprinkles."
+            },
+            {
+                "text1": "#Blessed:",
+                "featureId": 3,
+                "text2": "milk chocolate wrapped with vanilla ice cream, white chocolate, and cookie crumbles."
+            }
+        ]
+    ],
+    "products": [
+        {
+            "product_name": "#mood Ice Cream, Pints (16oz)",
+            "product_price": "$5.24",
+            "landpage_id": 1
+        },
+        {
+            "product_name": "#mood Ice Cream, Pints (16oz)",
+            "product_price": "$4.49",
+            "landpage_id": 2
+        },
+        {
+            "product_name": "#mood Ice Cream, Pints (16oz)",
+            "product_price": "$3.99",
+            "landpage_id": 3
+        },
+        {
+            "product_name": "#mood Ice Cream, Pints (16oz), 3 Count",
+            "product_price": "$10",
+            "landpage_id": 4
+        },
+        {
+            "product_name": "#mood Ice Cream, Half Pints (8oz), 4 Count",
+            "product_price": "$10",
+            "landpage_id": 5
+        },
+        {
+            "product_name": "#mood Ice Cream, Half Pints (8oz), 5 Count",
+            "product_price": "$10",
+            "landpage_id": 6
+        },
+        {
+            "product_name": "#mood Ice Cream, Mini-Pints (4oz), 4 Count",
+            "product_price": "$4.49",
+            "landpage_id": 7
+        },
+        {
+            "product_name": "#mood Ice Cream, Mini-Pints (4oz), 4 Count",
+            "product_price": "$3.99",
+            "landpage_id": 8
+        },
+        {
+            "product_name": "#mood Ice Cream Bars, 3 Count",
+            "product_price": "$4.60",
+            "landpage_id": 9
+        },
+        {
+            "product_name": "#mood Ice Cream Bars, 4 Count",
+            "product_price": "$5.49",
+            "landpage_id": 10
+        },
+        {
+            "product_name": "#mood Ice Cream Bars, 6 Count",
+            "product_price": "$5.99",
+            "landpage_id": 11
+        }
+    ]
+}

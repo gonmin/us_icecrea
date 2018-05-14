@@ -1,22 +1,22 @@
 <template>
   <div id="app">
     <div class="logo">
-      <img src="http://img.qdtech.ai/upload/decision/a6/1b/a61b41b73dadc975f348d5093f64da58.jpg" alt="">
+      <img onclick="return false" src="http://img.qdtech.ai/upload/decision/a6/1b/a61b41b73dadc975f348d5093f64da58.jpg" alt="">
     </div>
     <div class="prouct-img">
-      <img src="http://img.qdtech.ai/upload/decision/d1/62/d16254f6188b38777d4995820e075ebb.jpg" alt="">
+      <img onclick="return false" :src="headingImg" alt="">
     </div>
     
     <div class="intro">
       <div class="word">
-        <p>Introducing Ice Cream for any #mood.</p>
-        <p>Enjoy our playfully delicious ice cream sticks, available online only!</p>
+        <p>{{introWord[0]}}</p>
+        <p>{{introWord[1]}}</p>
       </div>
     </div>
     <div class="swiper-container">
         <div class="swiper-wrapper">
-            <div class="swiper-slide" v-for="img in swiperImg" :key="img.id">
-              <img :src="img.img" alt="">
+            <div class="swiper-slide" v-for="img in swiperImg" :key="img.imgId">
+              <img onclick="return false" :src="img.img" alt="">
             </div>
         </div>
         <div class="swiper-pagination"></div>
@@ -27,15 +27,16 @@
         <span>{{feature.text2}}</span>
       </div>
       <div class="feature-sumary"><strong>Delivered frozen to your door with dry ice.</strong></div>
-      <div class="price-intro"><strong>#mood Ice Cream Bars, 3 Count</strong></div>
-      <div class="price"><b>$ 4.60</b></div>
-      <div class="product-btn" @click="showModal=true"></div>
+      <div class="price-intro"><strong>{{productInfo.product_name}}</strong></div>
+      <div class="price"><b>{{productInfo.product_price}}</b></div>
+      <div class="product-btn" ref="productBtn" @click="productClick"></div>
     </div>
+
     <div class="modal" :class="{ 'show-modal': showModal}">
 			<div class="modal-wrap">
         <i class="close-btn" @click="showModal=false"></i>
         <div class="title">
-          <img src="http://img.qdtech.ai/upload/decision/f3/c4/f3c4f2203779e58612b3b6c4bdfa2eea.jpg" alt="">
+          <img onclick="return false" src="http://img.qdtech.ai/upload/decision/f3/c4/f3c4f2203779e58612b3b6c4bdfa2eea.jpg" alt="">
         </div>
         <div class="content">
           <h3>Sorry</h3>
@@ -48,24 +49,17 @@
 
 <script>
   import Swiper from 'swiper'
+  import axios from 'axios'
+  import productData from './data.json'
+  import imgData from './img.json'
+  import {getUrlParam, getScrollTop, getWindowHeight, getScrollHeight} from './utils/util'
+
   export default {
     name: 'app',
     data: function() {
       return {
         showModal: false,
         swiperImg: [
-          {
-            id: 1,
-            img: 'http://img.qdtech.ai/upload/decision/a8/12/a812d221d394d46d2e9f482c14f392ce.jpg'
-          },
-          {
-            id: 2,
-            img: 'http://img.qdtech.ai/upload/decision/d0/3b/d03b79970c422c2b4adaa39a9f717842.jpg'
-          },
-          {
-            id: 3,
-            img: 'http://img.qdtech.ai/upload/decision/a9/7d/a97db30185d75f754a438d1cc46a0a09.jpg'
-          }
         ],
         features: [
           {
@@ -83,29 +77,234 @@
             featureId: 3,
             text2: 'milk chocolate wrapped with vanilla ice cream, white chocolate, and cookie crumbles.'
           }
-        ]
+        ],
+        introWord: [],
+        productData: {},
+        productInfo: {},
+        mySwiper: null,
+        headingImg: '',
+        landPageId: 1,
+        kz_user_id: '',
+        scrollToBottom: false
       }
     },
     methods: {
       addImgFalse: function addImgFalse() {
         var imgs = document.querySelectorAll('img');
         imgs.forEach(function (img) {
-          img.setAttribute('onclick', false);
+          img.setAttribute('onclick', 'return false;');
         });
+      },
+      initSwiper: function () {
+        // this.mySwiper = new Swiper('.swiper-container', {
+        //   pagination: '.swiper-pagination',
+        //   autoplay: 3000,
+        //   loop: true
+        // });
+      },
+      setlandpageWord: function (landPageId) {
+        landPageId = parseInt(landPageId);
+        if (landPageId > 11) {
+          landPageId = 11;
+        }
+        if (landPageId <= 8) {
+          this.introWord = this.productData.firstWord[0];
+          this.features = this.productData.secondWord[0];
+        } else {
+          this.introWord = this.productData.firstWord[1];
+          this.features = this.productData.secondWord[1];
+        }
+        this.productInfo = this.productData.products[landPageId - 1];
+      },
+      handImg: function (imgData, landPageId) {
+        landPageId = parseInt(landPageId);
+        imgData.forEach(function(item) {
+          item.productImgs2 = []
+          item.productImgs.forEach(function(item2, index2){
+            item.productImgs2.push({
+              img: item2,
+              imgId: index2 + 1
+            })
+          })
+        })
+        var imgIndex;
+        if (landPageId <= 4) {
+          imgIndex = 0
+        } else if (landPageId === 5 || landPageId === 6){
+          imgIndex = 1
+        } else if (landPageId === 7 || landPageId === 8){
+          imgIndex = 2
+        } else if (landPageId === 9){
+          imgIndex = 3
+        } else if (landPageId === 10){
+          imgIndex = 4
+        } else if (landPageId === 11){
+          imgIndex = 5
+        }
+        this.$nextTick(function() {
+          this.swiperImg = imgData[imgIndex].productImgs2
+          this.headingImg = imgData[imgIndex].headImg
+        })
+      },
+      commonApi: function (params, fn, fnErr) {
+        var hostname = this.getHostName();
+        axios.get(hostname, {
+            params: params
+          })
+          .then(function (response) {
+            typeof fn === 'function' && fn(response.data)
+          })
+          .catch(function (error) {
+            typeof fnErr === 'function' && fnErr(error)
+          });
+      },
+      getHostName: function () {
+        // var isDev = !location.hostname || /^dev|test|\d{1,3}|localhost|file/.test(window.location.hostname);
+        // var hostname = isDev ? 'http://dev.s.qdtech.ai/project/php_pcp/index.php'
+        // : 'http://s.qdtech.ai/project/php_pcp/index.php';
+        // return hostname;
+        var host = location.hostname === 's.qdtech.ai' ? location.host : 'dev.s.qdtech.ai';
+        console.log('location.host', location.hostname, 'host', host)
+        return 'http://' + host + '/project/php_pcp/index.php'
+      },
+      callVisit: function (landPageIdNum) {
+        var that = this;
+        var params = {
+          mod: 'us_ice_cream',
+          act: 'visit',
+          kz_user_id: this.kz_user_id,
+          land_page_id: landPageIdNum
+        }
+        this.commonApi(params, function(data) {
+          that.updateIndex = data.pcp_browse_time
+          that.updateTime();
+        })
+      },
+      updateTime: function () {
+        var that = this;
+        this.updateTimeTimer = setInterval(function() {
+          if (that.updateIndex >= 85) {
+            clearInterval(that.updateTimeTimer)
+            return;
+          }
+          that.updateIndex += 1;
+          console.log(that.updateIndex)
+          that.updateTimeApi();
+        }, 1000)
+      },
+      updateTimeApi: function () {
+          var params = {
+            mod: 'us_ice_cream',
+            act: 'browseTimeUpdate',
+            kz_user_id: this.kz_user_id
+          }
+          this.commonApi(params, function() {
+
+          })
+      },
+      watchScroll: function () {
+        console.log('watchScroll')
+        var that = this;
+        if (this.scrollToBottom) {
+          return;
+        }
+        window.addEventListener('scroll', function(e) {
+          console.log(getScrollTop() + getWindowHeight(), getScrollHeight(), '1位置')
+      //     if((getScrollTop() + getWindowHeight() + 14) > getScrollHeight()){
+      //       if (that.scrollToBottom) {
+      //         return;
+      //       }
+      //       that.scrollToBottom = true;
+      //       that.scrollBottomApi()
+      // 　　}
+          if(getScrollTop() + getWindowHeight() > that.$refs.productBtn.offsetTop + 40){
+            if (that.scrollToBottom) {
+              return;
+            }
+            that.scrollToBottom = true
+            that.scrollBottomApi()
+      　　}
+        })
+      },
+      scrollBottomApi: function () {
+        var that = this;
+        var params = {
+          mod: 'us_ice_cream',
+          act: 'fullscreen',
+          kz_user_id: this.kz_user_id
+        }
+        this.commonApi(params, function (response) {
+          console.log('这里是调用了scrollApi', response)
+          that.scrollToBottom = true;
+        }, function () {
+          that.scrollToBottom = false;
+        })
+      },
+      productClick: function () {
+        var that = this;
+        this.showModal = true;
+        var params = {
+          mod: 'us_ice_cream',
+          act: 'productClick',
+          kz_user_id: this.kz_user_id
+        }
+        this.commonApi(params, function (data) {
+          console.log('点击商品成功');
+        }, function () {
+          console.log('点击商品失败');
+        })
       }
     },
     mounted: function () {
+      var landPageId = getUrlParam('land_page_id') || '1';
+      this.kz_user_id = getUrlParam('kz_user_id') || 'oul6yhyythc4ggw' || 'oul75uuqh008so8';
+      // this.kz_user_id = getUrlParam('kz_user_id');
+      console.log(getUrlParam('kz_user_id'), 'hhhggggg')
+      this.productData = productData;
+      this.handImg(imgData, landPageId)
+      this.setlandpageWord(landPageId);
+      var landPageIdNum = parseInt(landPageId);
+      this.landPageId = parseInt(landPageId);
+      // this.addImgFalse();
+        this.watchScroll();
+        console.log('九点啦')
+      // 进入页面就访问
+      this.callVisit(landPageIdNum)
       this.$nextTick(function () {
-      var mySwiper = new Swiper('.swiper-container', {
+        
+      });
+    },
+    watch: {
+      swiperImg: function () {
+        var that = this;
+        that.$nextTick(function () {
+          this.mySwiper = null;
+          this.mySwiper = new Swiper('.swiper-container', {
           pagination: '.swiper-pagination',
           autoplay: 3000,
-           parallax : true,
+          autoplayDisableOnInteraction: false,
           loop: true
         });
-      });
-      this.addImgFalse()
+        })
+      },
+      showModal: function (newValue) {
+        if (newValue) {
+          var that = this;
+          var params = {
+            mod: 'us_ice_cream',
+            act: 'viewSorryPage',
+            kz_user_id: this.kz_user_id
+          }
+          this.commonApi(params, function (data) {
+            console.log('打开窗口成功');
+          }, function () {
+            console.log('打开窗口');
+          })
+        }
+      }
     },
-    components: {
+    created: function () {
+        
     }
   }
 </script>
@@ -113,7 +312,6 @@
   .swiper-container {
     height: 264px;
     .swiper-slide {
-      background-color: red;
       img {
         width: 100%;
         height: 100%;
@@ -194,7 +392,8 @@
 	right: 0;
 	bottom: 0;
   margin: auto;
-	width: calc(100% - 52px);
+  width: calc(100% - 52px);
+  
 	height: 250px;
   background-color: #fff;
   border-radius: 4px;

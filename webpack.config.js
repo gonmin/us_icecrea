@@ -5,8 +5,8 @@ module.exports = {
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, './dist'),
-    publicPath: 'http://dev.s.qdtech.ai/project/landpage/us_icecream/dist/',
-    publicPath: '/dist/',
+    publicPath: 'http://s.qdtech.ai/project/landpage/us_icecream/dist/',
+    // publicPath: '/dist/',
     filename: 'build.js'
   },
   module: {
